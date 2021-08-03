@@ -38,6 +38,20 @@ int main(int argc, char** argv)
 		}
 		cout << "Id:  " << i << "  edge" << "\t\t" << res << endl;
 	}
+	/*vector<arma::vec3> edge;
+	edge.push_back(VertexVec_s[1]);
+	edge.push_back(VertexVec_s[0]);
+	arma::vec3 u = gs.GetNormal_edge(B, edge);
+	std::vector<arma::vec3> list_gauss_point_s_edge;
+	std::vector<double> list_gauss_weight_s_edge;
+	gs.GenerateGaussPointEdge(edge, list_gauss_point_s_edge, list_gauss_weight_s_edge);
+
+	int num_gauss_nodes_s_edge = list_gauss_point_s_edge.size();
+	double res = 0.0;
+	for (int j = 0; j < num_gauss_nodes_s_edge; ++j) {
+		tmp = list_gauss_weight_s_edge[j];
+		res += tmp;
+	}*/
 
 	return 0;
 }

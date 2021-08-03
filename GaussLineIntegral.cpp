@@ -1,7 +1,7 @@
 #include "GaussLineIntegral.h"
 
 
-void GaussLineIntegral::GaussLineIntegral::GenerateGaussPointEdge(vector<arma::vec3>& edge, vector<arma::vec3>& list_gauss_point_s_edge, vector<double>& list_gauss_weight_s_edge)
+void GaussLineIntegral::GenerateGaussPointEdge(vector<arma::vec3>& edge, vector<arma::vec3>& list_gauss_point_s_edge, vector<double>& list_gauss_weight_s_edge)
 {
 	std::vector<double> X, W;
 	int node_num = 12;
