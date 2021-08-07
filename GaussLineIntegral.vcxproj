@@ -144,11 +144,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Function.cpp" />
     <ClCompile Include="GaussLineIntegral.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Function.h" />
     <ClInclude Include="GaussLineIntegral.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>

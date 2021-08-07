@@ -1,5 +1,5 @@
 #include"main.h"
-#include"GaussLineIntegral.h"
+
 
 using namespace std;
 
@@ -7,13 +7,21 @@ int main(int argc, char** argv)
 {
 	arma::vec3 A = { 1,1,0 };
 	arma::vec3 B = { 2,2,0 };
-	arma::vec3 C = { 1,2,0 };
+	arma::vec3 C = { 3,3,0 };
+	vector<arma::vec3> VertexVec;
+	VertexVec.push_back(C);
+	VertexVec.push_back(A);
+	VertexVec.push_back(B);
+
+	{ // 测试函数区
+		int test = fc.GetArea(VertexVec);
+		cout << test << endl;
+	}
+
 	vector<arma::vec3> VertexVec_s;
 	VertexVec_s.push_back(C);
 	VertexVec_s.push_back(A);
 	VertexVec_s.push_back(B);
-
-	GaussLineIntegral gs;
 
 	size_t length = VertexVec_s.size();
 	double res_total = 0.0;
@@ -38,6 +46,7 @@ int main(int argc, char** argv)
 		}
 		cout << "Id:  " << i << "  edge" << "\t\t" << res << endl;
 	}
+
 	/*vector<arma::vec3> edge;
 	edge.push_back(VertexVec_s[1]);
 	edge.push_back(VertexVec_s[0]);

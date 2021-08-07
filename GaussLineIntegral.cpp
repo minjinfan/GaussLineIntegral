@@ -76,5 +76,19 @@ arma::vec3 GaussLineIntegral::GetNormal_edge(const arma::vec3& A, const std::vec
 	u = u / arma::norm(u);
 
 	return u;
-
 }
+
+//arma::vec3 GaussLineIntegral::Getr0(const arma::vec3& A, const std::vector<arma::vec3>& VertexVec) {
+//	arma::vec3 temp1, temp2, n_, r0;
+//
+//	r0.zeros();
+//	SubEq(temp1, VertexVec[0], VertexVec[1]);
+//	SubEq(temp2, VertexVec[0], VertexVec[2]);
+//	fcross(n_, temp1, temp2);
+//	n_ /= arma::norm(n_);
+//	double t = arma::dot(VertexVec[0] - A, n_) / pow(arma::norm(n_), 2);
+//	for (int i = 0; i < 3; ++i) {
+//		r0[i] = A[i] + n_[i] * t;
+//	}
+//	return r0;
+//}

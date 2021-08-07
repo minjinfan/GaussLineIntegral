@@ -42,3 +42,14 @@ inline void fcross(arma::vec3& X, const arma::vec3& a, const arma::vec3& b)
 	X[1] = a[2] * b[0] - a[0] * b[2];
 	X[2] = a[0] * b[1] - a[1] * b[0];
 }
+
+inline arma::vec3 fcross(const arma::vec3& a, const arma::vec3& b)
+{
+	arma::vec3 X;
+	X.zeros();
+	X[0] = a[1] * b[2] - a[2] * b[1];
+	X[1] = a[2] * b[0] - a[0] * b[2];
+	X[2] = a[0] * b[1] - a[1] * b[0];
+
+	return X;
+}
