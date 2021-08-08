@@ -5,17 +5,40 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	arma::vec3 A = { 1,1,0 };
-	arma::vec3 B = { 2,2,0 };
+	arma::vec3 A = { 0,0,0 };
+	arma::vec3 B = { 3,0,0 };
 	arma::vec3 C = { 3,3,0 };
 	vector<arma::vec3> VertexVec;
-	VertexVec.push_back(C);
 	VertexVec.push_back(A);
 	VertexVec.push_back(B);
+	VertexVec.push_back(C);
 
 	{ // 测试函数区
-		int test = fc.GetArea(VertexVec);
-		cout << test << endl;
+		arma::vec3 p = { 2, 1, 6 };
+
+		double testArea = fc.GetArea(VertexVec);
+		cout << "testArea:  " << testArea << endl;
+
+		fc.GetFactor(p, VertexVec);
+
+		vector<arma::vec3> edge;
+		edge.push_back(B);
+		edge.push_back(C);
+
+		arma::vec3 norm = fc.OutNormal_edge(A, edge);
+		cout << "norm:  " << norm << endl;
+
+		arma::vec3 DropFeet = fc.GetDropFeet_edge(A, edge);
+		cout << "DropFeet:  " << DropFeet << endl;
+
+		arma::vec3 r0 = fc.Getr0(p, VertexVec);
+		cout << "r0:  " << r0 << endl;
+		arma::vec3 Pi = SubEq(r0, p);
+		cout << "Pi:  " << Pi << endl;
+
+		bool flag = fc.IsOnEdge(p, VertexVec);
+		//bool flag = fc.IsInTriangle(p, VertexVec);
+		cout << "flag:  " << flag << endl;
 	}
 
 	vector<arma::vec3> VertexVec_s;

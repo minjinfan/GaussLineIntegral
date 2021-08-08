@@ -35,6 +35,16 @@ inline void faxpBy(arma::vec3& Y, double& a, arma::vec3& X, const arma::vec3& B)
 	}
 }
 
+// 点积
+inline double fdot(arma::vec3 x, arma::vec3 y)
+{
+	double z = 0;
+	for (size_t j = 0; j < 3; j++) {
+		z += x[j] * y[j];
+	}
+	return z;
+}
+
 // 叉乘 X = a x b
 inline void fcross(arma::vec3& X, const arma::vec3& a, const arma::vec3& b)
 {
