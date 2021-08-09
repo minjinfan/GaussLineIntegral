@@ -6,6 +6,7 @@
 #include"GaussLineIntegral.h"
 //#include"Common.h"
 
+using namespace std;
 class Function : public GaussLineIntegral
 {
 public:
@@ -26,5 +27,6 @@ public:
 
 	bool IsInTriangle(const arma::vec3& A, const std::vector<arma::vec3>& vertexVec);
 	bool IsOnEdge(const arma::vec3& A, const std::vector<arma::vec3>& vertexVec);
+	bool IsOnEdge_edge(const arma::vec3& P, const std::vector<arma::vec3>& vertexVec);
 };
 

@@ -5,16 +5,16 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	arma::vec3 A = { 0,0,0 };
-	arma::vec3 B = { 3,0,0 };
-	arma::vec3 C = { 3,3,0 };
+	arma::vec3 A = { 2,0,0 };
+	arma::vec3 B = { 0,2,0 };
+	arma::vec3 C = { 0,0,2 };
 	vector<arma::vec3> VertexVec;
 	VertexVec.push_back(A);
 	VertexVec.push_back(B);
 	VertexVec.push_back(C);
 
 	{ // 测试函数区
-		arma::vec3 p = { 2, 1, 6 };
+		arma::vec3 p = { 2, 2, 2 };
 
 		double testArea = fc.GetArea(VertexVec);
 		cout << "testArea:  " << testArea << endl;
@@ -22,8 +22,9 @@ int main(int argc, char** argv)
 		fc.GetFactor(p, VertexVec);
 
 		vector<arma::vec3> edge;
+		edge.push_back(A);
 		edge.push_back(B);
-		edge.push_back(C);
+		bool Is = fc.IsOnEdge_edge(p, edge);
 
 		arma::vec3 norm = fc.OutNormal_edge(A, edge);
 		cout << "norm:  " << norm << endl;
