@@ -93,6 +93,7 @@ using namespace std;
 		//    integral_result += pow(-1.0, i)*log(sqrt(ai*Ei*Ei+bi*Ei+ci)+Ei)/A;
 		//    continue;
 		// }
+		return 0;
 	}
 
 	// [Debug]
