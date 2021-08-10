@@ -1,5 +1,32 @@
 #include"Function.h"
 
+void Function::LineGaussIntegral(vector<arma::vec3>& VertexVec_s)
+{
+	size_t length = VertexVec_s.size();
+	double res_total = 0.0;
+	double tmp = 0.0;
+	for (int i = 0; i < length; ++i) {
+		double res = 0.0;
+		arma::vec3 u;
+		arma::vec3 A = VertexVec_s[i];
+		vector<arma::vec3> edge;
+		edge.push_back(VertexVec_s[(i + 1) % 3]);
+		edge.push_back(VertexVec_s[(i + 2) % 3]);
+		u = GetNormal_edge(A, edge);
+
+		std::vector<arma::vec3> list_gauss_point_s_edge;
+		std::vector<double> list_gauss_weight_s_edge;
+		gs.GenerateGaussPointEdge(edge, list_gauss_point_s_edge, list_gauss_weight_s_edge);
+
+		int num_gauss_nodes_s_edge = list_gauss_point_s_edge.size();
+		for (int j = 0; j < num_gauss_nodes_s_edge; ++j) {
+			tmp = list_gauss_weight_s_edge[j];
+			res += tmp;
+		}
+		cout << "Id:  " << i << "  edge" << "\t\t" << res << endl;
+	}
+}
+
 arma::vec3 Function::Getr0(const arma::vec3& A, const std::vector<arma::vec3>& VertexVec) {
 	arma::vec3 temp1, temp2, n_, r0;
 
@@ -252,12 +279,12 @@ void Function::GetFactor(const arma::vec3& r, const std::vector<arma::vec3>& Ver
 
 	arma::vec3 r0;
 	r0 = Getr0(r, VertexVec);
-	cout << "r0:  " << r0 << endl;
+	//cout << "r0:  " << r0 << endl;
 
 	double d = Getd(r, VertexVec);
 	double d2 = arma::norm(SubEq(r0, r));
-	cout << "d: " << d << endl;
-	cout << "d2: " << d2 << endl;
+	/*cout << "d: " << d << endl;
+	cout << "d2: " << d2 << endl;*/
 	bool IsInTri = IsInTriangle(r0, VertexVec);
 	vector<arma::vec3> U;
 	vector<arma::vec3> Pi;
@@ -283,7 +310,7 @@ void Function::GetFactor(const arma::vec3& r, const std::vector<arma::vec3>& Ver
 		// Caculate U
 		arma::vec3 u;
 		arma::vec3 A_O = GetDropFeet_edge(A, edge);
-		cout << "A_O:  " << A_O << endl << endl;
+		//cout << "A_O:  " << A_O << endl << endl;
 		SubEq(u, A_O, A);
 		u = u / arma::norm(u);
 		U[i] = u;
@@ -296,7 +323,7 @@ void Function::GetFactor(const arma::vec3& r, const std::vector<arma::vec3>& Ver
 		else {
 			r0_O = GetDropFeet_edge(r0, edge);
 		}
-		cout << "r0_O:  " << r0_O << endl;
+		//cout << "r0_O:  " << r0_O << endl;
 
 		// Caculate Pi
 		arma::vec3 pi = SubEq(r0_O, r0);
@@ -372,5 +399,151 @@ void Function::GetFactor(const arma::vec3& r, const std::vector<arma::vec3>& Ver
 		result += result_tmp;
 	}
 	
+	cout << endl;
+}
+
+void Function::InnerIntegralNonsingularFigure_R3_EM(double &result,const arma::vec3& r, const std::vector<arma::vec3>& VertexVec)
+{
+	size_t length = VertexVec.size();
+
+	arma::vec3 r0;
+	r0 = Getr0(r, VertexVec);
+	cout << "r0:  " << r0 << endl;
+
+	double d = Getd(r, VertexVec);
+	double d2 = arma::norm(SubEq(r0, r));
+	cout << "d: " << d << endl;
+	//cout << "d2: " << d2 << endl;
+	bool IsInTri = IsInTriangle(r0, VertexVec);
+	vector<arma::vec3> U;
+	vector<arma::vec3> Pi;
+	vector<arma::vec2> Li;
+	vector<arma::vec2> Ri;
+	vector<double> Ro_pow;
+	U.resize(length);
+	Pi.resize(length);
+	Li.resize(length);
+	Ri.resize(length);
+	Ro_pow.resize(length);
+
+	for (int i = 0; i < length; ++i) {
+		bool flag;
+		vector<arma::vec3> edge;
+		arma::vec3 A = VertexVec[i];
+		arma::vec3 B = VertexVec[(i + 1) % 3];
+		arma::vec3 C = VertexVec[(i + 2) % 3];
+
+		edge.push_back(B);
+		edge.push_back(C);
+
+		// Caculate U
+		arma::vec3 u;
+		arma::vec3 A_O = GetDropFeet_edge(A, edge);
+		//cout << "A_O:  " << A_O << endl << endl;
+		SubEq(u, A_O, A);
+		u = u / arma::norm(u);
+		U[i] = u;
+
+		bool IsOnEdge = IsOnEdge_edge(r0, edge);
+		arma::vec3 r0_O;
+		if (IsOnEdge) {
+			r0_O = r0;
+		}
+		else {
+			r0_O = GetDropFeet_edge(r0, edge);
+		}
+		cout << "ID " << i+1 << " Feet:  " << r0_O << endl;
+
+		// Caculate Pi
+		arma::vec3 pi = SubEq(r0_O, r0);
+		Pi[i] = SubEq(r0_O, r0);
+
+		// Caculate Li
+		bool IsInTri_O = IsInTriangle(r0_O, VertexVec);
+		arma::vec2 li;
+		li.zeros();
+		if (IsInTri_O) {
+			li[0] = arma::norm(SubEq(r0_O, B)) * (-1);
+			li[1] = arma::norm(SubEq(r0_O, C));
+
+			/*cout << SubEq(r0_O, B) << endl;
+			cout << arma::norm(SubEq(r0_O, B)) << endl;
+			cout << SubEq(r0_O, C) << endl;
+			cout << arma::norm(SubEq(r0_O, C)) << endl;*/
+		}
+		else {
+			double first = arma::norm(SubEq(r0_O, B));
+			double second = arma::norm(SubEq(r0_O, C));
+			if (first < second) {
+				li[0] = first;
+				li[1] = second;
+			}
+			else {
+				li[0] = -1 * first;
+				li[1] = -1 * second;
+			}
+		}
+		Li[i] = li;
+
+		// Caculate Ro 、Ri
+		double Ro_pow_tmp = pow(arma::norm(pi), 2) + pow(d, 2);
+		Ro_pow[i] = Ro_pow_tmp;
+		arma::vec2 Ri_tmp;
+		Ri_tmp[0] = sqrt(Ro_pow_tmp + pow(li[0], 2));
+		Ri_tmp[1] = sqrt(Ro_pow_tmp + pow(li[1], 2));
+		Ri[i] = Ri_tmp;
+
+	}
+
+	for (auto u : U) {
+		cout << "U: " << u << endl;
+	}
+	cout << endl;
+	for (auto p : Pi) {
+		cout << "Pi:  " << p << endl;
+	}
+	cout << endl;
+	for (auto l : Li) {
+		cout << "Li:  " << l << endl;
+	}
+	for (auto Ro2 : Ro_pow) {
+		cout << "R02:  " << Ro2 << endl;
+	}
+	for (auto ri : Ri) {
+		cout << "Ri:  " << ri << endl;
+	}
+
+	cout << endl;
+
+	double Res = 0.0;
+	for (int i = 0; i < length; ++i) {
+		double pi = arma::norm(Pi[i]);
+		double li_right = Li[i][1];
+		double Ri_right = Ri[i][1];
+		double res1 = atan2(pi * li_right, Ro_pow[i] + d * Ri_right);
+		cout << "atan2 res1:  " << res1 << endl;
+
+		double li_left = Li[i][0];
+		double Ri_left = Ri[i][0];
+		double res2 = atan2(pi * li_left, Ro_pow[i] + d * Ri_left);
+		cout << "atan2 res2:  " << res2 << endl;
+
+		double res = res1 - res2;
+		cout << "atan2 res:  " << res << endl;
+
+		arma::vec3 ppp;
+		if (arma::norm(Pi[i]) != 0) {
+			ppp = Pi[i] / arma::norm(Pi[i]);
+		}
+		else {
+			ppp = { 0,0,0 };
+		}
+		double result_tmp = fdot(U[i], ppp) * res;
+		cout << "result_tmp:  " << result_tmp << endl;
+		Res += result_tmp;
+	}
+	result = Res ;
+	cout << "Res:  " << Res << endl;
+
 	cout << endl;
 }

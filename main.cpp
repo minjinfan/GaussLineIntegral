@@ -5,71 +5,116 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	arma::vec3 A = { 2,0,0 };
-	arma::vec3 B = { 0,2,0 };
-	arma::vec3 C = { 0,0,2 };
+	double x_tmp = 1;
+	double y_tmp = 1;
+	arma::vec3 A = { 0,0,0 };
+	arma::vec3 B = { x_tmp,0,0 };
+	arma::vec3 C = { 0,y_tmp,0 };
 	vector<arma::vec3> VertexVec;
 	VertexVec.push_back(A);
 	VertexVec.push_back(B);
 	VertexVec.push_back(C);
 
+	arma::vec3 p = { 1.2, 1.2, 0.5 };
+
+	{
+		cout << endl;
+		arma::vec3 fp = p;
+		double d = fp[2];
+
+		double x_max = x_tmp;
+		double y_max = y_tmp;
+
+		vector<double> x_list;
+		vector<double> y_list;
+
+		int step = 2000;
+		for (int i = 1; i < step; i++) {
+			x_list.push_back(x_max / step * i);
+			y_list.push_back(y_max / step * i);
+		}
+
+		vector<arma::vec3> a_list;
+		vector<arma::vec3> DiscritPoint_list;
+		DiscritPoint_list.clear();
+		a_list.clear();
+		for (auto x : x_list) {
+			for (auto y : y_list) {
+				if (x < x_max && y < y_max - x) {
+					arma::vec3 a = { x, y, 0 };
+					DiscritPoint_list.push_back(a);
+				}
+				/*arma::vec3 a = { x, y, 0 };
+				a_list.push_back(a);*/
+			}
+		}
+		cout << DiscritPoint_list.size() << endl;
+		cout << a_list.size() << endl;
+
+		/*vector<arma::vec3> DiscritPoint_list;
+		for (auto a : a_list) {
+			if (a[0] < x_max && a[1] < y_max - a[0]) {
+				DiscritPoint_list.push_back(a);
+			}
+		}
+		cout << DiscritPoint_list.size() << endl;*/
+
+		double ds = x_max * y_max / 2.0 / DiscritPoint_list.size();
+		double res1 = 0.0;
+		double res2 = 0.0;
+
+		/*for (int i = DiscritPoint_list.size() - 1; i > DiscritPoint_list.size() - 11; i--) {
+			cout << DiscritPoint_list[i] << endl;
+		}*/
+		for (arma::vec3 sp : DiscritPoint_list) {
+			double R = arma::norm(fp - sp);
+			double one_over_R3 = d / pow(R, 3);
+
+			res1 += 1.0 * ds;
+			res2 += one_over_R3 * ds;
+		}
+		cout << "res1:  " << res1 << endl;
+		cout << "res2:  " << res2 << endl;
+
+		//cout << "res:  " << res2 * d << endl;
+	}
 	{ // 测试函数区
-		arma::vec3 p = { 2, 2, 2 };
+		cout << endl;
+
+		double result = 0.0;
+		fc.InnerIntegralNonsingularFigure_R3_EM(result, p, VertexVec);
+		cout << "result:  " << result << endl;
 
 		double testArea = fc.GetArea(VertexVec);
 		cout << "testArea:  " << testArea << endl;
 
-		fc.GetFactor(p, VertexVec);
 
-		vector<arma::vec3> edge;
-		edge.push_back(A);
-		edge.push_back(B);
-		bool Is = fc.IsOnEdge_edge(p, edge);
+		//vector<arma::vec3> edge;
+		//edge.push_back(B);
+		//edge.push_back(C);
+		//bool Is = fc.IsOnEdge_edge(p, edge);
 
-		arma::vec3 norm = fc.OutNormal_edge(A, edge);
-		cout << "norm:  " << norm << endl;
+		//arma::vec3 u1 = fc.OutNormal_edge(A, edge);
+		//cout << "u1:  " << u1 << endl;
 
-		arma::vec3 DropFeet = fc.GetDropFeet_edge(A, edge);
-		cout << "DropFeet:  " << DropFeet << endl;
+		//arma::vec3 r0 = fc.Getr0(p, VertexVec);
+		//cout << "r0:  " << r0 << endl;
+		//arma::vec3 DropFeet = fc.GetDropFeet_edge(r0, edge);
+		//cout << "DropFeet:  " << DropFeet << endl;
+		//arma::vec3 Pi = SubEq(DropFeet, r0);
+		//cout << "Pi:  " << Pi << endl;
 
-		arma::vec3 r0 = fc.Getr0(p, VertexVec);
-		cout << "r0:  " << r0 << endl;
-		arma::vec3 Pi = SubEq(r0, p);
-		cout << "Pi:  " << Pi << endl;
-
-		bool flag = fc.IsOnEdge(p, VertexVec);
-		//bool flag = fc.IsInTriangle(p, VertexVec);
-		cout << "flag:  " << flag << endl;
+		//bool flag = fc.IsOnEdge(p, VertexVec);
+		////bool flag = fc.IsInTriangle(p, VertexVec);
+		//cout << "flag:  " << flag << endl;
 	}
 
-	vector<arma::vec3> VertexVec_s;
+	/*vector<arma::vec3> VertexVec_s;
 	VertexVec_s.push_back(C);
 	VertexVec_s.push_back(A);
 	VertexVec_s.push_back(B);
 
-	size_t length = VertexVec_s.size();
-	double res_total = 0.0;
-	double tmp = 0.0;
-	for (int i = 0; i < length; ++i) {
-		double res = 0.0;
-		arma::vec3 u;
-		arma::vec3 A = VertexVec_s[i];
-		vector<arma::vec3> edge;
-		edge.push_back(VertexVec_s[(i + 1) % 3]);
-		edge.push_back(VertexVec_s[(i + 2) % 3]);
-		u = gs.GetNormal_edge(A, edge);
-
-		std::vector<arma::vec3> list_gauss_point_s_edge;
-		std::vector<double> list_gauss_weight_s_edge;
-		gs.GenerateGaussPointEdge(edge, list_gauss_point_s_edge, list_gauss_weight_s_edge);
-
-		int num_gauss_nodes_s_edge = list_gauss_point_s_edge.size();
-		for (int j = 0; j < num_gauss_nodes_s_edge; ++j) {
-			tmp = list_gauss_weight_s_edge[j];
-			res += tmp;
-		}
-		cout << "Id:  " << i << "  edge" << "\t\t" << res << endl;
-	}
+	fc.LineGaussIntegral(VertexVec_s);*/
 
 	/*vector<arma::vec3> edge;
 	edge.push_back(VertexVec_s[1]);

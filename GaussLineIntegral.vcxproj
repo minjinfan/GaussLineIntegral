@@ -145,14 +145,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Function.cpp" />
+    <ClCompile Include="GaussLegendreQuadrature.cpp" />
     <ClCompile Include="GaussLineIntegral.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="One_Over_R.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Constant.h" />
     <ClInclude Include="Function.h" />
+    <ClInclude Include="GaussLegendreQuadrature.h" />
     <ClInclude Include="GaussLineIntegral.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="One_Over_R.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
