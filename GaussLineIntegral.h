@@ -8,7 +8,7 @@
 using namespace std;
 using namespace arma;
 
-typedef double real;
+//typedef double real;
 
 class GaussLineIntegral
 {

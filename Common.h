@@ -5,7 +5,7 @@
 using namespace std;
 using namespace arma;
 
-typedef double real;
+//typedef double real;
 
 // X = a - b
 inline arma::vec3 SubEq(const arma::vec3& X, const arma::vec3& Y)
@@ -63,3 +63,20 @@ inline arma::vec3 fcross(const arma::vec3& a, const arma::vec3& b)
 
 	return X;
 }
+
+inline arma::vec3 faxpby(double& a, arma::vec3& X)
+{
+	arma::vec3 Y;
+	Y.zeros();
+	for (int i = 0; i < 3; ++i) {
+		Y[i] = a * X[i];
+	}
+}
+
+inline void faxpby(arma::vec3& Y, double& a, arma::vec3& X)
+{
+	for (int i = 0; i < 3; ++i) {
+		Y[i] = a * X[i];
+	}
+}
+

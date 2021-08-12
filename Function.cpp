@@ -1,17 +1,17 @@
 #include"Function.h"
 
-void Function::LineGaussIntegral(vector<arma::vec3>& VertexVec_s)
+void Function::LineGaussIntegral(vector<arma::vec3>& VertexVec)
 {
-	size_t length = VertexVec_s.size();
+	size_t length = VertexVec.size();
 	double res_total = 0.0;
 	double tmp = 0.0;
 	for (int i = 0; i < length; ++i) {
 		double res = 0.0;
 		arma::vec3 u;
-		arma::vec3 A = VertexVec_s[i];
+		arma::vec3 A = VertexVec[i];
 		vector<arma::vec3> edge;
-		edge.push_back(VertexVec_s[(i + 1) % 3]);
-		edge.push_back(VertexVec_s[(i + 2) % 3]);
+		edge.push_back(VertexVec[(i + 1) % 3]);
+		edge.push_back(VertexVec[(i + 2) % 3]);
 		u = GetNormal_edge(A, edge);
 
 		std::vector<arma::vec3> list_gauss_point_s_edge;
@@ -78,6 +78,19 @@ arma::vec3 Function::OutNormal_edge(const arma::vec3& A, const std::vector<arma:
 	SubEq(u, r0, A);
 	u = u / arma::norm(u);
 	 
+	return u;
+
+}
+
+arma::vec3 Function::GetNormal_edge(const arma::vec3& A, const std::vector<arma::vec3>& edge)
+{
+	
+	arma::vec3 r0, u;
+	r0 = GetDropFeet_edge(A, edge);
+
+	SubEq(u, r0, A);
+	u = u / arma::norm(u);
+
 	return u;
 
 }
@@ -546,4 +559,114 @@ void Function::InnerIntegralNonsingularFigure_R3_EM(double &result,const arma::v
 	cout << "Res:  " << Res << endl;
 
 	cout << endl;
+}
+
+void Function::HighSingularity_EM(double& result,
+	const std::vector<arma::vec3>& VertexVec_s, const std::vector<arma::vec3>& VertexVec_f)
+{
+	double NearSingular1_Yes = 0.0;
+	size_t length = VertexVec_s.size();
+
+	l_div_2area_f = 1.0 / 2.0 / GetArea(VertexVec_f);
+	l_div_2area_s = 1.0 / 2.0 / GetArea(VertexVec_s);
+
+	double sf = 1.0 / GetJacobi_f;
+	double ss = 1.0 / GetJacobi_s;
+
+	for (int i = 0; i < length; i++) {
+		arma::vec3 u;
+		arma::vec3 A = VertexVec_s[i];
+		vector<arma::vec3> edge;
+		edge.push_back(VertexVec_s[(i + 1) % 3]);
+		edge.push_back(VertexVec_s[(i + 2) % 3]);
+		u = GetNormal_edge(A, edge);
+
+		double res_edge = 0.0;
+		double integral_result_tmp1 = 0.0;
+		double integral_result_tmp2 = 0.0;
+		double integral_result_tmp3 = 0.0;
+
+		std::vector<arma::vec3> list_gauss_point_s_edge;
+		std::vector<double> list_gauss_weight_s_edge;
+		gs.GenerateGaussPointEdge(edge, list_gauss_point_s_edge, list_gauss_weight_s_edge);
+		// GenerateGaussPointEdge_new(edge, list_gauss_point_s_edge, list_gauss_weight_s_edge);
+		int num_gauss_nodes_s_edge = list_gauss_point_s_edge.size();
+		for (int j = 0; j < num_gauss_nodes_s_edge; j++) {
+
+			arma::vec3 one_Rth_Vec_1;
+			arma::vec3 one_Rth_Vec_2;
+			double one_Rth = 0.0;
+
+			arma::vec3 tmp1;
+			arma::vec3 tmp2;
+			arma::vec3 tmp3;
+
+			InnerIntegralSingularFigureFreespace_R3_EM(one_Rth_Vec_1, one_Rth_Vec_2, one_Rth, VertexVec_f, list_gauss_point_s_edge[j]);
+
+			fcross(tmp1, one_Rth_Vec_1, u);
+			fcross(tmp2, one_Rth_Vec_2, u);
+			faxpby(tmp3, one_Rth, u);
+
+			integral_result_tmp1 = fdot(SubEq(Vn, Vm), tmp1);
+			integral_result_tmp2 = fdot(SubEq(Vn, Vm), tmp2);
+			integral_result_tmp3 = fdot(fcross(Vm, Vn), tmp3);
+
+			NearSingular1_Yes += (integral_result_tmp1 + integral_result_tmp2 + integral_result_tmp3) * list_gauss_weight_s_edge[j];
+
+			double res_tmp = (integral_result_tmp1 + integral_result_tmp2 + integral_result_tmp3) * list_gauss_weight_s_edge[j];
+			cout << "(  " << i + 1 << " ,  " << j+1 << "  )  "<< res_tmp << endl;
+			res_edge += res_tmp;
+		}
+		cout << "res_edge:  " << res_edge << endl;
+	}
+	//NearSingular1_Yes *= l_div_2area_f * l_div_2area_s;
+
+	result = NearSingular1_Yes;
+
+	cout << "result:  " << result << endl;
+}
+
+void Function::InnerIntegralSingularFigureFreespace_R3_EM(arma::vec3& one_Rth_Vec_1, arma::vec3& one_Rth_Vec_2,
+									double& one_Rth, const vector<arma::vec3> &VertexVec_f, const arma::vec3& gauss_point_s)
+{
+	//arma::cx_vec3 one_Rth_Vec_tmp2, one_Rth_Vec_tmp3;
+	arma::vec3 one_Rth_Vec_tmp1, one_Rth_Vec_tmp2, r0, SubVmr;
+
+	one_Rth_Vec_tmp1 = GeneralIntegralOverROfTriVec(VertexVec_f, gauss_point_s) * (1.0);
+	one_Rth = GeneralIntegralOverROfTri(VertexVec_f, gauss_point_s);
+
+	
+	faxpby(one_Rth_Vec_tmp2, one_Rth, Vm);
+
+	one_Rth_Vec_1 = one_Rth_Vec_tmp1;
+	one_Rth_Vec_2 = one_Rth_Vec_tmp2;
+
+	one_Rth_Vec_1 *= GetJacobi_f;
+	one_Rth_Vec_2 *= GetJacobi_f;
+	one_Rth *= GetJacobi_f;
+}
+
+arma::vec3 Function::GeneralIntegralOverROfTriVec(const std::vector<arma::vec3>& vertexes,
+	const arma::vec3& gauss_point)
+{
+	arma::vec3 integral({ 0, 0, 0 });
+
+	if (vertexes.size() == 3) {
+		integral = integral + compute_One_Over_R_vec(vertexes[0], vertexes[1], vertexes[2], gauss_point, vertexes[0]);
+	}
+	else {
+		integral = integral + compute_One_Over_R_vec(vertexes[0], vertexes[1], vertexes[2], vertexes[3], gauss_point,
+			vertexes[0], vertexes[1]) * 8.0;
+	}
+	return integral;
+}
+
+double Function::GeneralIntegralOverROfTri(const std::vector<arma::vec3>& vertexes, const arma::vec3& gauss_point)
+{
+	if (vertexes.size() == 3) {
+		return compute_One_Over_R_part_Correct(vertexes[0], vertexes[1], vertexes[2], gauss_point);
+	}
+	else {
+		return compute_One_Over_R_part_Correct(vertexes[0], vertexes[1], vertexes[2], vertexes[3], gauss_point) * 4.0;
+	}
 }

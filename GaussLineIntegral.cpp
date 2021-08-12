@@ -4,7 +4,7 @@
 void GaussLineIntegral::GenerateGaussPointEdge(vector<arma::vec3>& edge, vector<arma::vec3>& list_gauss_point_s_edge, vector<double>& list_gauss_weight_s_edge)
 {
 	std::vector<double> X, W;
-	int node_num = 12;
+	int node_num = 5;
 	if (node_num == 5) {
 		X.push_back(0.0);
 		X.push_back(0.5384693101);
